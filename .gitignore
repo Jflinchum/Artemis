@@ -27,3 +27,7 @@ Run/obj/*
 *.VC.opendb
 
 !Dependencies/*.dll
+
+# Game Files
+Win64
+Logs
