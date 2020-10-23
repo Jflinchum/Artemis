@@ -179,9 +179,10 @@ namespace ArtemisServer.GameServer
             GameFlowData.Get().gameState = GameState.EndingTurn;
             ArtemisServerResolutionManager.Get().ApplyActions();
 
-            // Update statuses
+            // Iterate over each player in the game
             foreach (ActorData actor in GameFlowData.Get().GetActors())
             {
+                // Update statuses
                 var actorStatus = actor.GetActorStatus();
                 for (StatusType status = 0; status < StatusType.NUM; status++)
                 {
@@ -199,6 +200,9 @@ namespace ArtemisServer.GameServer
                         }
                     }
                 }
+                // Progress the cooldowns
+                AbilityData actorAbilityData = actor.GetAbilityData();
+                actorAbilityData.ProgressCooldowns();
             }
             yield return null;
         }

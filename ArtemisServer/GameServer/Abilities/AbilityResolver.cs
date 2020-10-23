@@ -12,6 +12,7 @@ namespace ArtemisServer.GameServer.Abilities
         protected Ability m_ability;
         protected AbilityPriority m_priority;
         protected ActorTargeting.AbilityRequestData m_abilityRequestData;
+        protected AbilityData m_abilityData;
 
         public Dictionary<ActorData, Dictionary<AbilityTooltipSymbol, int>> TargetedActors;
         public List<ClientResolutionAction> Actions;
@@ -22,12 +23,13 @@ namespace ArtemisServer.GameServer.Abilities
 
         protected AbilityData.ActionType ActionType { get => m_abilityRequestData.m_actionType; }
 
-        public AbilityResolver(ActorData actor, Ability ability, AbilityPriority priority, ActorTargeting.AbilityRequestData abilityRequestData)
+        public AbilityResolver(ActorData actor, Ability ability, AbilityPriority priority, ActorTargeting.AbilityRequestData abilityRequestData, AbilityData abilityData)
         {
             m_caster = actor;
             m_ability = ability;
             m_priority = priority;
             m_abilityRequestData = abilityRequestData;
+            m_abilityData = abilityData;
         }
 
         public void Resolve()
@@ -94,6 +96,7 @@ namespace ArtemisServer.GameServer.Abilities
                 Actions.Add(MakeResolutionAction(actorToHitResults, seqSource));
                 MakeAnimations(seqSource);
             }
+            m_abilityData.TriggerCooldown(ActionType);
             CurrentTargeterResolver = null;
         }
 

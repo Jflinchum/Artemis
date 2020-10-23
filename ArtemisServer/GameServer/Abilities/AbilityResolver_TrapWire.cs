@@ -14,8 +14,8 @@ namespace ArtemisServer.GameServer.Abilities
         private ScoundrelTrapWire Ability => m_ability as ScoundrelTrapWire;
         private AbilityUtil_Targeter_Grid Targeter => m_ability.Targeter as AbilityUtil_Targeter_Grid;
 
-        public AbilityResolver_TrapWire(ActorData actor, Ability ability, AbilityPriority priority, ActorTargeting.AbilityRequestData abilityRequestData)
-            : base(actor, ability, priority, abilityRequestData)
+        public AbilityResolver_TrapWire(ActorData actor, Ability ability, AbilityPriority priority, ActorTargeting.AbilityRequestData abilityRequestData, AbilityData abilityData)
+            : base(actor, ability, priority, abilityRequestData, abilityData)
         {
             BoardSquare square = GetGameplayRefSquare(abilityRequestData.m_targets[0], m_caster);
             m_targetSquare = square.GetGridPosition();
