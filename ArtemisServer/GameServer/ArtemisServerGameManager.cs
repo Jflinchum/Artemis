@@ -203,6 +203,11 @@ namespace ArtemisServer.GameServer
                 // Progress the cooldowns
                 AbilityData actorAbilityData = actor.GetAbilityData();
                 actorAbilityData.ProgressCooldowns();
+
+                // Apply energy/tech point regen effects
+                int newTechPoints = actor.TechPoints + actor.m_techPointRegen;
+                Log.Info($"{actor.DisplayName} regens ${actor.m_techPointRegen} tech points");
+                actor.SetTechPoints(newTechPoints);
             }
             yield return null;
         }
