@@ -44,6 +44,7 @@ namespace ArtemisServer.GameServer.Abilities
         protected virtual void ResolveImpl()
         {
             List<TargeterResolver> targeterResolvers = new List<TargeterResolver>();
+            int energyDelta = 0;
 
             for (int i = 0; i < m_abilityRequestData.m_targets.Count; ++i)
             {
@@ -51,9 +52,24 @@ namespace ArtemisServer.GameServer.Abilities
                 targeterResolvers.Add(CurrentTargeterResolver);
                 CurrentTargeterResolver.Prepare();
             }
+            // Dictionary of tech point interactions that get modified over the course of resolving the ability
+            // Once per cast rewards get removed once they get applied to the total delta
+            Dictionary<TechPointInteractionType, int> techPointResolutionDict = new Dictionary<TechPointInteractionType, int>();
+            Log.Info($"Tech Point Interactions");
+            foreach(TechPointInteraction techPointInteraction in m_ability.GetBaseTechPointInteractions())
+            {
+                techPointResolutionDict.Add(techPointInteraction.m_type, techPointInteraction.m_amount);
+                Log.Info($"Type: {techPointInteraction.m_type}");
+                Log.Info($"Amount: {techPointInteraction.m_amount}");
+            }
+            if (techPointResolutionDict.TryGetValue(TechPointInteractionType.RewardOnCast, out int techPointsOnCast))
+            {
+                energyDelta += techPointsOnCast;
+            }
 
             // Based on ActorTargeting.CalculateTargetedActors
             Log.Info($"{m_ability.Targeters.Count}/{m_ability.GetExpectedNumberOfTargeters()} targeters");
+            // Loop through the amount of targeters
             for (int i = 0; i < m_ability.Targeters.Count && i < m_ability.GetExpectedNumberOfTargeters(); i++)
             {
                 CurrentTargeterResolver = targeterResolvers[i];
@@ -76,8 +92,17 @@ namespace ArtemisServer.GameServer.Abilities
                             // NOTE: If you add something here (or in descendants), make sure that ArtemisServerResolutionManager.ApplyActions can process it
                             case AbilityTooltipSymbol.Damage:
                                 CurrentTargeterResolver.Targeter.IsActorInTargetRange(targetedActor.Key, out bool inCover);
+                                // Apply the energy gain from an ability hitting a target
+                                techPointResolutionDict.TryGetValue(TechPointInteractionType.RewardOnDamage_PerTarget, out int techPointsOnDamagePerTarget);
+                                techPointResolutionDict.TryGetValue(TechPointInteractionType.RewardOnDamage_OncePerCast, out int techPointsOnDamagePerCast);
+                                // Remove once per cast tech point resolutions
+                                if (techPointsOnDamagePerCast > 0)
+                                {
+                                    techPointResolutionDict.Remove(TechPointInteractionType.RewardOnDamage_OncePerCast);
+                                }
                                 hitResults = new ClientActorHitResultsBuilder()
                                     .SetDamage(symbol.Value, Vector3.zero, inCover, false, false)  // TODO
+                                    .SetTechPoints(0, 0, techPointsOnDamagePerTarget + techPointsOnDamagePerCast) // TODO enemy gain/loss of energy
                                     .SetRevealCaster()  // TODO
                                     .SetRevealTarget()  // TODO
                                     .Build();
@@ -96,7 +121,11 @@ namespace ArtemisServer.GameServer.Abilities
                 Actions.Add(MakeResolutionAction(actorToHitResults, seqSource));
                 MakeAnimations(seqSource);
             }
+            // Trigger Cooldown
             m_abilityData.TriggerCooldown(ActionType);
+            // Decrement energy based on cost of ability
+            energyDelta -= m_ability.m_techPointsCost;
+            m_caster.SetTechPoints(m_caster.TechPoints + energyDelta);
             CurrentTargeterResolver = null;
         }
 
