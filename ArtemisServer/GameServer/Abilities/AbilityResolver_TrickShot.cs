@@ -7,8 +7,8 @@ namespace ArtemisServer.GameServer.Abilities
 {
     class AbilityResolver_TrickShot : AbilityResolver
     {
-        public AbilityResolver_TrickShot(ActorData actor, Ability ability, AbilityPriority priority, ActorTargeting.AbilityRequestData abilityRequestData, AbilityData abilityData)
-            : base(actor, ability, priority, abilityRequestData, abilityData)
+        public AbilityResolver_TrickShot(ActorData actor, Ability ability, AbilityPriority priority, ActorTargeting.AbilityRequestData abilityRequestData)
+            : base(actor, ability, priority, abilityRequestData)
         { }
 
         protected override TargeterResolver MakeTargeterResolver(Ability ability, int index, AbilityUtil_Targeter targeter, AbilityTarget target, ActorData caster)

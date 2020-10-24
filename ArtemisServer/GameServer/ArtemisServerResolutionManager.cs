@@ -158,7 +158,7 @@ namespace ArtemisServer.GameServer
                 }
                 Log.Info($"Resolving {ability.m_abilityName} for {actor.DisplayName}");
 
-                AbilityResolver resolver = GetAbilityResolver(actor, ability, priority, ard, abilityData);
+                AbilityResolver resolver = GetAbilityResolver(actor, ability, priority, ard);
                 resolver.Resolve();
                 ActionsThisPhase.AddRange(resolver.Actions);
                 Animations.AddRange(resolver.Animations);
@@ -265,19 +265,19 @@ namespace ArtemisServer.GameServer
             TheatricsPendingClients.Remove(player.m_accountId);
         }
 
-        private AbilityResolver GetAbilityResolver(ActorData actor, Ability ability, AbilityPriority priority, ActorTargeting.AbilityRequestData abilityRequestData, AbilityData abilityData)
+        private AbilityResolver GetAbilityResolver(ActorData actor, Ability ability, AbilityPriority priority, ActorTargeting.AbilityRequestData abilityRequestData)
         {
             if (ability.m_abilityName == "Trick Shot")
             {
                 Log.Info("AbilityResolver_TrickShot");
-                return new AbilityResolver_TrickShot(actor, ability, priority, abilityRequestData, abilityData);
+                return new AbilityResolver_TrickShot(actor, ability, priority, abilityRequestData);
             }
             else if (ability.m_abilityName == "Trapwire")
             {
                 Log.Info("AbilityResolver_TrapWire");
-                return new AbilityResolver_TrapWire(actor, ability, priority, abilityRequestData, abilityData);
+                return new AbilityResolver_TrapWire(actor, ability, priority, abilityRequestData);
             }
-            return new AbilityResolver(actor, ability, priority, abilityRequestData, abilityData);
+            return new AbilityResolver(actor, ability, priority, abilityRequestData);
         }
 
         public void ApplyActions()

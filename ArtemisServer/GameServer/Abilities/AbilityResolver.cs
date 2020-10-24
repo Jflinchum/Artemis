@@ -23,13 +23,13 @@ namespace ArtemisServer.GameServer.Abilities
 
         protected AbilityData.ActionType ActionType { get => m_abilityRequestData.m_actionType; }
 
-        public AbilityResolver(ActorData actor, Ability ability, AbilityPriority priority, ActorTargeting.AbilityRequestData abilityRequestData, AbilityData abilityData)
+        public AbilityResolver(ActorData actor, Ability ability, AbilityPriority priority, ActorTargeting.AbilityRequestData abilityRequestData)
         {
             m_caster = actor;
             m_ability = ability;
             m_priority = priority;
             m_abilityRequestData = abilityRequestData;
-            m_abilityData = abilityData;
+            m_abilityData = actor.GetAbilityData();
         }
 
         public void Resolve()
